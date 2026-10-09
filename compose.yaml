@@ -1,0 +1,19 @@
+name: pinjamlab
+services:
+  web:
+    build:
+      context: .
+    image: pinjamlab:2.1
+    ports:
+      - "127.0.0.1:${APP_PORT:-8080}:8000"
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?Jalankan scripts/setup-env.ps1 terlebih dahulu}
+      DB_PATH: /app/data/pinjamlab.sqlite3
+    volumes:
+      - appdata:/app/data
+    restart: unless-stopped
+    init: true
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  appdata:

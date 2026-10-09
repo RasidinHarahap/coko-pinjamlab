@@ -1,0 +1,16 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+*.log
+data/
+*.sqlite3*
+*.mp4
+*.mkv
+.DS_Store
+
+BUKTI_TUGAS01_*.zip
+
+LOG_MULAI_PINJAMLAB.txt
+.local/
+node_modules/
