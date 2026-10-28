@@ -1,18 +1,10 @@
-# Informasi Proyek Tim Coko
+# Informasi Proyek PinjamLab v5.0
 
-Nama tim: Coko
+**Kelompok:** Tim Coko  
+**Anggota:** Rasidin Harahap (231110869), Ade Kurnia Setialu (231110333), Arsenius P. Sinaga (231111699)  
+**Mata kuliah:** Pengenalan DevOps — Tugas Kelompok 1 MID  
+**Topik:** Website peminjaman alat laboratorium menggunakan Docker
 
-Anggota:
-1. Rasidin Harahap (231110869)
-2. Ade Kurnia Setialu (231110333)
-3. Arsenius P. Sinaga (231111699)
+Fitur inti: CRUD alat, CRUD peminjaman, serah-terima kondisi, status terlambat, bukti cetak/PDF browser, ekspor CSV, pencarian, filter, jejak audit dan persisten SQLite pada Docker named volume. PinjamLab adalah proyek demonstrasi lokal petugas tanpa autentikasi multi-akun.
 
-Topik proyek: Website Peminjaman Alat Laboratorium (PinjamLab)
-
-Penjelasan proyek:
-PinjamLab membantu petugas laboratorium mengelola inventaris, mencatat peminjaman, dan memeriksa pengembalian alat. Fitur meliputi tambah, lihat, ubah, dan hapus data alat serta transaksi; pencarian dan filter status; dashboard; pencatatan kondisi awal/akhir; bukti peminjaman yang dapat dicetak; ekspor CSV; serta jejak aktivitas. Satu unit hanya dapat memiliki satu peminjaman aktif, dan durasi peminjaman maksimal tujuh hari. Aplikasi menggunakan Flask dan SQLite serta dijalankan dengan Docker Compose. Database disimpan pada named volume agar tetap tersedia sesudah container dibuat ulang.
-
-Sumber kode:
-Source aplikasi, antarmuka, skema database, dan konfigurasi container disusun khusus untuk proyek PinjamLab dengan bantuan ChatGPT/OpenAI Codex. Komponen pihak ketiga yang digunakan adalah Python, Flask, Gunicorn, dan SQLite. Referensi teknis tercantum pada laporan dan README. Source lengkap dilampirkan melalui repository kelompok.
-
-Lampiran source GitHub: Tautan repository ini menjadi lampiran source proyek.
+Teknologi: Python 3.12, Flask 3.1.2, Gunicorn 23.0.0, Jinja, HTML/CSS/JavaScript lokal, SQLite, Docker Compose. Bantuan AI digunakan dalam penyusunan desain dan source; tim tetap bertanggung jawab memahami, menguji dan mempresentasikan proyek.

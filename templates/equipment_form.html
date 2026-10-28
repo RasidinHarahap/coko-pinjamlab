@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon %}
+{% block title %}{{ 'Ubah' if editing else 'Tambah' }} alat{% endblock %}
+{% block page_label %}Data alat{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('equipment_list') }}">{{ icon('arrow-left') }}Data alat</a>
+<div class="page-heading"><div><p class="eyebrow">INVENTARIS</p><h1>{{ 'Ubah' if editing else 'Tambah' }} alat</h1><p>Satu data untuk satu unit alat.</p></div></div>
+<div class="form-layout">
+<section class="panel form-panel">{% if error %}<div class="alert error" role="alert">{{ icon('info') }}<span>{{ error }}</span></div>{% endif %}
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<div class="form-grid"><label>Kode alat<input name="code" maxlength="40" required value="{{ item.get('code','') }}" placeholder="LAB-006" autocomplete="off"></label><label>Nama alat<input name="name" maxlength="120" required value="{{ item.get('name','') }}" placeholder="Proyektor laboratorium"></label></div>
+<div class="form-grid"><label>Kategori<input name="category" maxlength="80" required value="{{ item.get('category','Umum') }}" placeholder="Presentasi"></label><label>Lokasi penyimpanan<input name="location" maxlength="80" required value="{{ item.get('location','Laboratorium') }}" placeholder="Rak A / Lab 1"></label></div>
+<label>Kondisi<select name="condition" aria-label="Kondisi" required>{% for c in conditions %}<option {{ 'selected' if item.get('condition','Baik') == c else '' }}>{{ c }}</option>{% endfor %}</select></label>
+<details class="optional-fields" {% if item.get('notes') %}open{% endif %}><summary>Catatan tambahan <span>opsional</span></summary><label><span class="sr-only">Catatan alat</span><textarea name="notes" maxlength="500" rows="3" placeholder="Misalnya: remote dan kabel lengkap">{{ item.get('notes','') }}</textarea></label></details>
+<div class="form-feedback" role="status" aria-live="polite"><span class="feedback-beacon"></span><span data-form-feedback>Lengkapi informasi unit untuk menyimpan inventaris.</span></div>
+<div class="form-actions"><button class="button" type="submit">{{ icon('check') }}Simpan alat</button><a class="button button-outline" href="{{ url_for('equipment_list') }}">Batal</a></div>
+</form></section>
+
+<aside class="form-aside" aria-label="Panduan inventaris">
+  <span class="aside-kicker">PANDUAN / 01</span>
+  <div class="aside-illustration" aria-hidden="true"><span class="aside-illustration-icon">{{ icon('box') }}</span><span>PL / INVENTORY</span></div>
+  <h2>Inventaris yang <em>siap ditelusuri.</em></h2>
+  <p>Setiap alat mewakili satu unit fisik. Kode unik membantu petugas memeriksa identitas dan kondisinya.</p>
+  <ul class="aside-list"><li><span>01</span> Gunakan kode unit yang berbeda</li><li><span>02</span> Catat lokasi penyimpanan yang jelas</li><li><span>03</span> Periksa kondisi sebelum dipinjam</li></ul>
+  <div class="aside-foot">DATA ALAT <span>→</span> PEMINJAMAN <span>→</span> PENGEMBALIAN</div>
+</aside>
+</div>
+{% endblock %}

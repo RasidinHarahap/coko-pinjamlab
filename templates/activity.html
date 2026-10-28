@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon %}
+{% block title %}Jejak aktivitas{% endblock %}
+{% block page_label %}Jejak aktivitas{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">RIWAYAT PERUBAHAN</p><h1>Jejak aktivitas</h1><p>100 tindakan terakhir, termasuk data yang dihapus.</p></div></div>
+<section class="panel">{% if entries %}<div class="table-scroll" tabindex="0" aria-label="Tabel jejak aktivitas"><table class="activity-table"><caption class="sr-only">Tindakan terakhir yang tercatat</caption><thead><tr><th>Waktu (UTC)</th><th>Tindakan</th><th>Referensi</th><th>Rincian</th></tr></thead><tbody>{% for entry in entries %}<tr><td class="date-text">{{ entry.occurred_at }}</td><td><span class="action-tag">{{ entry.action }}</span></td><td>{{ entry.entity }} #{{ entry.entity_id }}</td><td>{{ entry.detail }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><span class="empty-icon">{{ icon('history') }}</span><h3>Belum ada aktivitas</h3><p>Perubahan data akan tercatat di sini.</p></div>{% endif %}</section>
+{% endblock %}

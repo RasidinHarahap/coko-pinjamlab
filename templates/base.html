@@ -1,0 +1,67 @@
+{% from 'macros.html' import icon %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#103c35">
+  <meta name="description" content="PinjamLab — ruang kerja inventaris, peminjaman, pengembalian, dan jejak aktivitas alat laboratorium.">
+  <title>{% block title %}PinjamLab{% endblock %} · PinjamLab</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body class="pinjamlab-app">
+  <div class="page-reading-track" aria-hidden="true"><div></div></div>
+  <div class="ambient-orb orb-one" aria-hidden="true"></div><div class="ambient-orb orb-two" aria-hidden="true"></div>
+  <a class="skip-link" href="#main">Langsung ke konten</a>
+  <aside class="sidebar" aria-label="Navigasi PinjamLab">
+    <a class="brand" href="{{ url_for('dashboard') }}" aria-label="PinjamLab, beranda">
+      <span class="brand-mark">{{ icon('box') }}</span>
+      <span class="brand-wordmark">Pinjam<span class="brand-lab">Lab</span><small>LABORATORY WORKSPACE</small></span>
+    </a>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-live"><span class="sidebar-live-dot"></span> <span>LAB OPERATIONS</span><span class="sidebar-live-code">LOKAL</span></div>
+    <p class="nav-label">MENU UTAMA <span>01—03</span></p>
+    <nav class="main-nav" aria-label="Navigasi utama">
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' else '' }}" {% if request.endpoint == 'dashboard' %}aria-current="page"{% endif %}>{{ icon('grid') }}<span>Dashboard</span><span class="nav-number">01</span></a>
+      <a href="{{ url_for('equipment_list') }}" class="{{ 'active' if request.endpoint in ['equipment_list','equipment_form'] else '' }}" {% if request.endpoint in ['equipment_list','equipment_form'] %}aria-current="page"{% endif %}>{{ icon('box') }}<span>Data alat</span><span class="nav-number">02</span></a>
+      <a href="{{ url_for('loan_list') }}" class="{{ 'active' if request.endpoint in ['loan_list','loan_form','loan_return','loan_receipt'] else '' }}" {% if request.endpoint in ['loan_list','loan_form','loan_return','loan_receipt'] %}aria-current="page"{% endif %}>{{ icon('arrows') }}<span>Peminjaman</span><span class="nav-number">03</span></a>
+    </nav>
+    <p class="nav-label nav-label-secondary">RIWAYAT</p>
+    <a class="activity-link {{ 'active' if request.endpoint == 'activity_list' else '' }}" href="{{ url_for('activity_list') }}" {% if request.endpoint == 'activity_list' %}aria-current="page"{% endif %}>{{ icon('history') }}<span>Jejak aktivitas</span><span class="nav-number">04</span></a>
+    <button class="command-trigger" type="button" data-command-open aria-keyshortcuts="Control+k Meta+k" aria-haspopup="dialog" aria-controls="command-dialog">{{ icon('search') }}<span>Akses cepat</span><kbd>⌘ K</kbd></button>
+    <div class="sidebar-bottom">
+      <div class="sidebar-note"><span class="sidebar-note-icon">{{ icon('check-circle') }}</span><span class="note-kicker">CATATAN OPERASIONAL</span><strong>Satu unit, satu pinjaman aktif.</strong><p>Setiap pergerakan alat tercatat dan dapat ditelusuri.</p><div class="note-rule"></div><span class="note-foot">LOKAL · SQLITE · DOCKER</span></div>
+      <div class="sidebar-meta"><span class="meta-indicator"></span>Mode kerja lokal <span class="sidebar-version">v5.0</span></div>
+    </div>
+  </aside>
+  <div class="workspace">
+    <header class="workspace-header">
+      <div class="header-location"><span class="header-kicker">PINJAMLAB <span class="header-slash">/</span> LABORATORIUM KAMPUS</span><span class="header-label">{% block page_label %}Ruang kerja{% endblock %}</span></div>
+      <div class="header-tools"><button class="header-command" type="button" data-command-open aria-label="Buka akses cepat">{{ icon('search') }}<span>Cari menu</span><kbd>Ctrl K</kbd></button><span class="header-system"><span class="live-dot"></span>Berjalan lokal</span><span class="date-chip">{{ icon('calendar') }}{{ today.strftime('%d/%m/%Y') }}<span class="date-zone">WIB</span></span></div>
+    </header>
+    <main id="main" class="main-content">
+      <div class="page-progress" aria-hidden="true"><span></span></div>
+      {% for category, message in get_flashed_messages(with_categories=true) %}<div class="alert {{ category }}" role="status">{{ icon('check-circle') if category == 'success' else icon('info') }}<span>{{ message }}</span></div>{% endfor %}
+      {% block content %}{% endblock %}
+    </main>
+    <button type="button" class="back-to-top" data-back-to-top aria-label="Kembali ke atas" title="Kembali ke atas">{{ icon('arrow-right') }}</button>
+    <footer class="footer"><span><strong>PINJAMLAB</strong><span class="footer-dot">/</span> INVENTARIS &amp; PEMINJAMAN LABORATORIUM</span><span class="footer-right">Dibuat untuk pencatatan yang tertib <span class="footer-dot">·</span> <a href="{{ url_for('activity_list') }}">Lihat jejak aktivitas {{ icon('arrow-right') }}</a></span></footer>
+  </div>
+  <nav class="mobile-dock" aria-label="Navigasi mobile"><a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' else '' }}" {% if request.endpoint == 'dashboard' %}aria-current="page"{% endif %}>{{ icon('grid') }}<span>Beranda</span></a><a href="{{ url_for('equipment_list') }}" class="{{ 'active' if request.endpoint in ['equipment_list','equipment_form'] else '' }}" {% if request.endpoint in ['equipment_list','equipment_form'] %}aria-current="page"{% endif %}>{{ icon('box') }}<span>Alat</span></a><a href="{{ url_for('loan_list') }}" class="{{ 'active' if request.endpoint in ['loan_list','loan_form','loan_return','loan_receipt'] else '' }}" {% if request.endpoint in ['loan_list','loan_form','loan_return','loan_receipt'] %}aria-current="page"{% endif %}>{{ icon('arrows') }}<span>Pinjaman</span></a><a href="{{ url_for('activity_list') }}" class="{{ 'active' if request.endpoint == 'activity_list' else '' }}" {% if request.endpoint == 'activity_list' %}aria-current="page"{% endif %}>{{ icon('history') }}<span>Riwayat</span></a></nav>
+  <dialog id="command-dialog" class="command-dialog" aria-labelledby="command-title">
+    <div class="command-topline"><div><span class="eyebrow">PINJAMLAB / NAVIGASI</span><h2 id="command-title">Menu cepat<span>.</span></h2></div><button type="button" class="command-close" data-command-close aria-label="Tutup menu">×</button></div>
+    <div class="command-search">{{ icon('search') }}<input type="search" id="command-input" placeholder="Ketik nama menu atau tindakan…" aria-label="Cari menu cepat" autocomplete="off"><kbd>ESC</kbd></div>
+    <div class="command-links" aria-label="Pilihan menu">
+      <a data-command-item data-keywords="beranda home statistik" href="{{ url_for('dashboard') }}">{{ icon('grid') }}<span><strong>Dashboard</strong><small>Ringkasan operasional dan statistik</small></span>{{ icon('arrow-right') }}</a>
+      <a data-command-item data-keywords="alat inventaris stok unit" href="{{ url_for('equipment_list') }}">{{ icon('box') }}<span><strong>Data alat</strong><small>Inventaris dan ketersediaan unit</small></span>{{ icon('arrow-right') }}</a>
+      <a data-command-item data-keywords="alat inventaris daftar" href="{{ url_for('equipment_form') }}">{{ icon('plus') }}<span><strong>Tambah alat</strong><small>Daftarkan unit laboratorium</small></span>{{ icon('arrow-right') }}</a>
+      <a data-command-item data-keywords="pinjam loan sewa transaksi" href="{{ url_for('loan_list') }}">{{ icon('arrows') }}<span><strong>Peminjaman</strong><small>Riwayat transaksi peminjaman</small></span>{{ icon('arrow-right') }}</a>
+      <a data-command-item data-keywords="pinjam loan sewa catat" href="{{ url_for('loan_form') }}">{{ icon('receipt') }}<span><strong>Catat peminjaman</strong><small>Transaksi serah terima baru</small></span>{{ icon('arrow-right') }}</a>
+      <a data-command-item data-keywords="riwayat audit log" href="{{ url_for('activity_list') }}">{{ icon('history') }}<span><strong>Jejak aktivitas</strong><small>Audit 100 tindakan terbaru</small></span>{{ icon('arrow-right') }}</a>
+    </div>
+    <p class="command-foot">Tekan <kbd>Ctrl</kbd> + <kbd>K</kbd> untuk membuka • <kbd>Esc</kbd> untuk menutup</p>
+  </dialog>
+</body>
+</html>

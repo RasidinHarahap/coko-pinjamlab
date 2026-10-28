@@ -1,0 +1,4 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon %}
+{% block title %}Periksa kembali{% endblock %}
+{% block content %}<section class="panel error-panel"><span class="empty-icon">{{ icon('info') }}</span><h1>Periksa kembali</h1><p>{{ message }}</p><a class="button" href="{{ url_for('dashboard') }}">Ke dashboard {{ icon('arrow-right') }}</a></section>{% endblock %}

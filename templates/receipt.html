@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon, badge %}
+{% block title %}Bukti PL-{{ '%05d'|format(loan.id) }}{% endblock %}
+{% block page_label %}Peminjaman{% endblock %}
+{% block content %}
+<a class="back-link no-print" href="{{ url_for('loan_list') }}">{{ icon('arrow-left') }}Peminjaman</a>
+<div class="page-heading no-print"><div><p class="eyebrow">BUKTI TRANSAKSI</p><h1>Serah terima tercatat.</h1></div><button class="button button-outline" type="button" data-print-receipt>{{ icon('print') }}Cetak / simpan PDF</button></div>
+<article class="panel receipt"><div class="receipt-heading"><div><span class="eyebrow">PINJAMLAB / LABORATORIUM KAMPUS</span><h2>Bukti peminjaman alat</h2></div><div class="receipt-number"><strong>PL-{{ '%05d'|format(loan.id) }}</strong>{{ badge(loan.status) }}</div></div>
+<dl class="receipt-grid"><div><dt>Peminjam</dt><dd>{{ loan.borrower }}</dd></div><div><dt>NIM</dt><dd>{{ loan.nim }}</dd></div><div><dt>Unit alat</dt><dd>{{ loan.code }} · {{ loan.equipment_name }}</dd></div><div><dt>Lokasi penyimpanan</dt><dd>{{ loan.location }}</dd></div><div><dt>Tanggal pinjam</dt><dd>{{ loan.borrowed_on.strftime('%d/%m/%Y') }}</dd></div><div><dt>Batas kembali</dt><dd>{{ loan.due_on.strftime('%d/%m/%Y') }}</dd></div><div class="wide"><dt>Keperluan</dt><dd>{{ loan.purpose }}</dd></div><div><dt>Kondisi awal</dt><dd>{{ loan.checkout_condition }}</dd></div><div><dt>Catatan awal</dt><dd>{{ loan.checkout_notes or 'Tidak ada catatan' }}</dd></div>{% if loan.returned_on %}<div><dt>Tanggal kembali</dt><dd>{{ loan.returned_on.strftime('%d/%m/%Y') }}</dd></div><div><dt>Kondisi akhir</dt><dd>{{ loan.return_condition }}</dd></div><div class="wide"><dt>Catatan pengembalian</dt><dd>{{ loan.return_notes or 'Tidak ada catatan' }}</dd></div>{% endif %}</dl>
+<div class="signatures"><div><span>Petugas laboratorium</span><span class="signature-line"></span></div><div><span>Peminjam</span><span class="signature-line"></span></div></div><p class="receipt-note">Tanda tangan diisi saat serah terima.</p>
+</article><div class="receipt-actions no-print"><a class="button button-outline" href="{{ url_for('loan_form',loan_id=loan.id) }}">{{ icon('edit') }}Ubah peminjaman</a>{% if not loan.returned_on %}<a class="button" href="{{ url_for('loan_return',loan_id=loan.id) }}">{{ icon('arrows') }}Kembalikan alat</a>{% endif %}</div>
+{% endblock %}

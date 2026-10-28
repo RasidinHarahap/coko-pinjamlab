@@ -36,6 +36,8 @@ def load_loan(conn, loan_id):
 
 @app.before_request
 def check_csrf():
+    if request.endpoint == "health":
+        return
     session.setdefault("csrf_token", secrets.token_hex(32))
     if request.method == "POST":
         submitted = request.form.get("csrf_token", "")
@@ -49,6 +51,12 @@ def security_headers(response):
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['Referrer-Policy'] = 'same-origin'
     response.headers['Cache-Control'] = 'no-store'
+    response.vary.add('Cookie')  # Session dan token CSRF tidak boleh dibagi antar browser.
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; "
+        "font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; "
+        "form-action 'self'; frame-ancestors 'self'"
+    )
     return response
 
 
@@ -77,7 +85,7 @@ def health():
     with connect() as conn:
         conn.execute('SELECT COUNT(*) FROM equipment').fetchone()
         conn.execute('SELECT COUNT(*) FROM loans').fetchone()
-    return jsonify(status='ok', database='SQLite connected', version='2.0')
+    return jsonify(status='ok', database='SQLite connected', version='5.0')
 
 
 @app.get('/')
@@ -93,6 +101,12 @@ def dashboard():
                  WHEN l.due_on < ? THEN 'Terlambat' ELSE 'Dipinjam' END AS status
             FROM loans l JOIN equipment e ON e.id=l.equipment_id ORDER BY l.id DESC LIMIT 6""",
             (today_jakarta().isoformat(),)).fetchall()
+        stock = conn.execute("""SELECT
+            COUNT(*) FILTER (WHERE e.condition IN ('Dalam perawatan', 'Rusak')) AS maintenance,
+            COUNT(*) FILTER (WHERE e.condition IN ('Baik','Baik dengan catatan') AND NOT EXISTS
+                (SELECT 1 FROM loans l WHERE l.equipment_id=e.id AND l.returned_on IS NULL)) AS available
+            FROM equipment e""").fetchone()
+        stats.update(stock)
     return render_template('dashboard.html', stats=stats, loans=recent)
 
 
@@ -100,12 +114,22 @@ def dashboard():
 def equipment_list():
     query = request.args.get('q','').strip()[:120]
     pattern = f'%{query}%'
+    selected_availability = request.args.get('availability', '')
+    if selected_availability not in ('', 'Tersedia', 'Dipinjam', 'Perlu perhatian'):
+        selected_availability = ''
     with connect() as conn:
         items = conn.execute("""SELECT e.*,EXISTS(SELECT 1 FROM loans l WHERE l.equipment_id=e.id
             AND l.returned_on IS NULL) AS is_borrowed FROM equipment e
-            WHERE e.name LIKE ? OR e.code LIKE ? OR e.category LIKE ? OR e.location LIKE ?
-            ORDER BY e.id DESC""", (pattern,)*4).fetchall()
-    return render_template('equipment_list.html', items=items, query=query)
+            WHERE (e.name LIKE ? OR e.code LIKE ? OR e.category LIKE ? OR e.location LIKE ?)
+            AND (? = '' OR
+                (? = 'Tersedia' AND e.condition IN ('Baik', 'Baik dengan catatan') AND NOT EXISTS
+                   (SELECT 1 FROM loans x WHERE x.equipment_id=e.id AND x.returned_on IS NULL)) OR
+                (? = 'Dipinjam' AND EXISTS
+                   (SELECT 1 FROM loans x WHERE x.equipment_id=e.id AND x.returned_on IS NULL)) OR
+                (? = 'Perlu perhatian' AND e.condition IN ('Rusak', 'Dalam perawatan')))
+            ORDER BY e.id DESC""", (pattern,)*4+(selected_availability,)*4).fetchall()
+    return render_template('equipment_list.html', items=items, query=query,
+                           selected_availability=selected_availability)
 
 
 @app.route('/alat/baru', methods=['GET','POST'])
@@ -219,8 +243,19 @@ def loan_form(loan_id=None):
                         fields+(tool['id'],tool['condition'])).lastrowid
                     action = 'Tambah'
                 else:
-                    conn.execute("""UPDATE loans SET borrower=?,nim=?,purpose=?,borrowed_on=?,due_on=?,
+                    # Pastikan objek masih ada dan belum berubah setelah GET/form dibuka.
+                    current = conn.execute('SELECT equipment_id, returned_on FROM loans WHERE id=?',
+                                           (loan_id,)).fetchone()
+                    if current is None:
+                        abort(404)
+                    if current['equipment_id'] != values['equipment_id']:
+                        raise ValueError('Unit alat pada riwayat tidak dapat diganti.')
+                    if current['returned_on'] and values['borrowed_on'] > current['returned_on']:
+                        raise ValueError('Tanggal pinjam tidak boleh setelah tanggal pengembalian.')
+                    updated = conn.execute("""UPDATE loans SET borrower=?,nim=?,purpose=?,borrowed_on=?,due_on=?,
                         checkout_notes=? WHERE id=?""",fields+(loan_id,))
+                    if updated.rowcount != 1:
+                        abort(404)
                     action = 'Ubah'
                 audit(conn,action,'peminjaman',loan_id,f"{tool['code']} · {values['borrower']} · batas {values['due_on']}")
             flash('Data peminjaman berhasil disimpan.','success')
@@ -249,6 +284,7 @@ def loan_return(loan_id):
     if request.method == 'POST':
         try:
             condition,notes = return_values(request.form)
+            was_updated = False
             with connect(write=True) as conn:
                 row = load_loan(conn,loan_id)
                 if row['returned_on'] is None:
@@ -256,7 +292,10 @@ def loan_return(loan_id):
                                  (today_jakarta().isoformat(),condition,notes,loan_id))
                     conn.execute('UPDATE equipment SET condition=? WHERE id=?',(condition,row['equipment_id']))
                     audit(conn,'Kembali','peminjaman',loan_id,f"{row['code']} · kondisi {condition} · {notes}")
-            flash('Pengembalian dan kondisi alat berhasil dicatat.','success')
+                    was_updated = True
+            flash('Pengembalian dan kondisi alat berhasil dicatat.' if was_updated else
+                  'Peminjaman ini sudah dikembalikan oleh permintaan sebelumnya.',
+                  'success' if was_updated else 'info')
             return redirect(url_for('loan_receipt',loan_id=loan_id))
         except ValueError as exc:
             error = str(exc)

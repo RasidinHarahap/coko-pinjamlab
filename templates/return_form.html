@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon %}
+{% block title %}Kembalikan alat{% endblock %}
+{% block page_label %}Peminjaman{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('loan_list') }}">{{ icon('arrow-left') }}Peminjaman</a>
+<div class="page-heading"><div><p class="eyebrow">PENGEMBALIAN</p><h1>Kembalikan alat</h1><p>Periksa kondisi akhir sebelum menyimpan.</p></div></div>
+<div class="form-layout">
+<section class="panel form-panel"><div class="handover-card"><span class="tool-icon">{{ icon('box') }}</span><div><strong>{{ loan.equipment_name }}</strong><small>{{ loan.code }} · {{ loan.borrower }}</small><p>Kondisi awal: <strong>{{ loan.checkout_condition }}</strong></p>{% if loan.checkout_notes %}<small>{{ loan.checkout_notes }}</small>{% endif %}</div></div>
+{% if error %}<div class="alert error" role="alert">{{ icon('info') }}<span>{{ error }}</span></div>{% endif %}
+<form method="post" data-return-form><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<label>Kondisi saat dikembalikan<select name="return_condition" aria-label="Kondisi saat dikembalikan" required>{% for c in conditions %}<option {{ 'selected' if item.get('return_condition','Baik') == c else '' }}>{{ c }}</option>{% endfor %}</select></label>
+<label>Catatan pengembalian<textarea name="return_notes" aria-describedby="return-help" maxlength="500" rows="3" placeholder="Misalnya: lengkap dan berfungsi baik">{{ item.get('return_notes','') }}</textarea></label><p class="field-help" id="return-help">Wajib diisi jika kondisi bukan Baik. Kondisi inventaris ikut diperbarui.</p>
+<div class="form-feedback" role="status" aria-live="polite"><span class="feedback-beacon"></span><span data-form-feedback>Periksa kondisi dan catatan pengembalian.</span></div>
+<div class="form-actions"><button class="button" type="submit">{{ icon('check') }}Simpan pengembalian</button><a class="button button-outline" href="{{ url_for('loan_list') }}">Batal</a></div>
+</form></section>
+
+<aside class="form-aside" aria-label="Panduan pengembalian">
+  <span class="aside-kicker">PANDUAN / 03</span>
+  <div class="aside-illustration" aria-hidden="true"><span class="aside-illustration-icon">{{ icon('check-circle') }}</span><span>PL / CHECK-IN</span></div>
+  <h2>Tutup transaksi <em>dengan jelas.</em></h2>
+  <p>Catat kondisi unit saat diserahkan kembali. Inventaris diperbarui bersamaan dengan transaksi.</p>
+  <ul class="aside-list"><li><span>01</span> Periksa alat dan kelengkapannya</li><li><span>02</span> Jika kondisi bukan Baik, catatan wajib</li><li><span>03</span> Simpan untuk menyelesaikan pengembalian</li></ul>
+  <div class="aside-foot">CEK KONDISI <span>→</span> SIMPAN <span>→</span> SELESAI</div>
+</aside>
+</div>
+{% endblock %}

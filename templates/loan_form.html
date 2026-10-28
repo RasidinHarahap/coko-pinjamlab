@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon %}
+{% block title %}{{ 'Ubah' if editing else 'Catat' }} peminjaman{% endblock %}
+{% block page_label %}Peminjaman{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('loan_list') }}">{{ icon('arrow-left') }}Peminjaman</a>
+<div class="page-heading"><div><p class="eyebrow">SERAH TERIMA</p><h1>{{ 'Ubah' if editing else 'Catat' }} peminjaman</h1><p>Pilih alat, isi peminjam, lalu simpan. Maksimal {{ max_loan_days }} hari.</p></div></div>
+<div class="form-layout">
+<section class="panel form-panel">{% if error %}<div class="alert error" role="alert">{{ icon('info') }}<span>{{ error }}</span></div>{% endif %}
+{% if not equipment %}<div class="alert info">{{ icon('info') }}<span>Belum ada alat siap dipinjam. <a href="{{ url_for('equipment_form') }}">Tambahkan alat</a> berkondisi baik atau catat pengembalian.</span></div>{% endif %}
+<form method="post" data-loan-form data-max-days="{{ max_loan_days }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<label>Alat<select name="equipment_id" aria-label="Alat" required>{% if not editing %}<option value="">Pilih alat tersedia</option>{% endif %}{% for tool in equipment %}{% if not editing or tool.id == original.equipment_id %}<option value="{{ tool.id }}" {{ 'selected' if item.get('equipment_id')|string == tool.id|string else '' }}>{{ tool.code }} · {{ tool.name }} · {{ tool.condition }}</option>{% endif %}{% endfor %}</select></label>
+<div class="form-grid"><label>Nama peminjam<input name="borrower" maxlength="120" required value="{{ item.get('borrower','') }}" placeholder="Nama lengkap" autocomplete="name"></label><label>NIM<input name="nim" maxlength="40" required value="{{ item.get('nim','') }}" placeholder="Nomor induk mahasiswa" autocomplete="off"></label></div>
+<label>Keperluan<input name="purpose" maxlength="240" required value="{{ item.get('purpose','') }}" placeholder="Misalnya: presentasi praktikum"></label>
+<div class="form-grid"><label>Tanggal pinjam<input type="date" name="borrowed_on" required max="{{ today }}" value="{{ item.get('borrowed_on','') }}"></label><label>Batas kembali<input type="date" name="due_on" required value="{{ item.get('due_on','') }}"><small class="date-hint">Maksimal {{ max_loan_days }} hari setelah tanggal pinjam.</small></label></div>
+<details class="optional-fields" {% if item.get('checkout_notes') %}open{% endif %}><summary>Catatan saat dipinjam <span>opsional</span></summary><label><span class="sr-only">Catatan saat dipinjam</span><textarea name="checkout_notes" maxlength="500" rows="3" placeholder="Kelengkapan atau kondisi yang diperiksa">{{ item.get('checkout_notes','') }}</textarea></label></details>
+<div class="form-feedback" role="status" aria-live="polite"><span class="feedback-beacon"></span><span data-form-feedback>Lengkapi data transaksi sesuai ketentuan.</span></div>
+<div class="form-actions"><button class="button" type="submit" {{ 'disabled' if not equipment else '' }}>{{ icon('check') }}Simpan peminjaman</button><a class="button button-outline" href="{{ url_for('loan_list') }}">Batal</a></div>
+</form></section>
+
+<aside class="form-aside" aria-label="Aturan peminjaman">
+  <span class="aside-kicker">PANDUAN / 02</span>
+  <div class="aside-illustration" aria-hidden="true"><span class="aside-illustration-icon">{{ icon('arrows') }}</span><span>PL / TRANSACTION</span></div>
+  <h2>Serah terima, <em>tanpa terlewat.</em></h2>
+  <p>Pilih alat yang tersedia, isi identitas peminjam, dan tentukan tanggal pengembalian.</p>
+  <ul class="aside-list"><li><span>01</span> Satu alat, satu peminjaman aktif</li><li><span>02</span> Maksimal {{ max_loan_days }} hari peminjaman</li><li><span>03</span> Bukti serah terima tersedia setelah disimpan</li></ul>
+  <div class="aside-foot">PILIH ALAT <span>→</span> SIMPAN <span>→</span> CETAK BUKTI</div>
+</aside>
+</div>
+{% endblock %}
