@@ -62,6 +62,15 @@ Pencatatan inventaris laboratorium membutuhkan **identitas unit yang jelas** dan
 |:--|:--|:--|
 | Kode unik, kategori, lokasi, kondisi, pencarian dan filter | Catat, ubah, kembalikan, cetak bukti, ekspor CSV | Validasi server, constraint SQLite, audit log, backup dan volume persisten |
 
+## ✦ Pembaruan untuk video kedua: Salin Kode Alat
+
+**Satu fitur baru:** pada halaman **Data Alat**, setiap kode inventaris kini memiliki tombol **Salin kode**. Klik tombol tersebut untuk menyalin kode unit ke clipboard; label berubah menjadi **Tersalin!** ketika berhasil. Kode dapat ditempel dengan `Ctrl + V` di kolom pencarian atau dokumen. Fitur ini hanya menggunakan HTML, CSS, dan JavaScript, tanpa mengubah struktur SQLite, aturan CRUD, atau konfigurasi Docker.
+
+**Bukti sebelum–sesudah:** source sebelumnya hanya menampilkan kode alat sebagai teks. Source revisi menambahkan tombol pada `templates/equipment_list.html`, handler di `static/app.js`, dan gaya pada `static/style.css`. Untuk video kedua, tampilkan perbedaan tersebut, kemudian jalankan `docker compose build` dan `docker compose up -d --wait` sebelum mendemonstrasikan tombol di browser `http://127.0.0.1:8080`.
+
+> [!NOTE]
+> Akses clipboard memerlukan izin browser dan konteks aman, seperti `localhost`. Jika browser menolak clipboard, tombol menampilkan pesan **Gagal disalin** dan data aplikasi tetap tidak berubah.
+
 ## ✦ Fitur utama
 
 | Modul | Kemampuan |

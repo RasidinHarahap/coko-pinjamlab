@@ -295,3 +295,9 @@ body{background-image:radial-gradient(ellipse at 83% -10%,#d7e6c7a3,transparent 
 @media(max-width:380px){.dispatch-head>strong{font-size:26px}.dispatch-link{padding:12px 8px}.dispatch-arrow{height:23px;width:23px}.dispatch-number{font-size:6.4px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.hero::after,.hero-scan,.orbit-sweep{display:none!important}}
 @media print{.dispatch-board{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));break-inside:avoid}.dispatch-lead{grid-column:1/-1}.stats-tools,.summary-feedback{display:none!important}.dispatch-link{box-shadow:none}.hero::after{display:none!important}}
+
+/* Video 2: tombol Salin kode pada daftar inventaris. */
+.equipment-code-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.equipment-copy-code{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:3px 8px;border:1px solid #c9dac3;border-radius:7px;background:#eef5e8;color:#315a36;font-family:inherit;font-size:10px;font-weight:650;cursor:pointer;transition:background .15s,border-color .15s}
+.equipment-copy-code:hover{background:#dfeeda;border-color:#9ebb95}
+.equipment-copy-code:focus-visible{outline:3px solid #b8db80;outline-offset:2px}

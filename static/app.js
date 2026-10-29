@@ -136,6 +136,29 @@
     }
   });
 
+  // VIDEO 2: satu fitur baru - salin kode alat, tanpa mengubah database.
+  document.querySelectorAll('[data-copy-equipment-code]').forEach(button => {
+    const code = button.dataset.copyEquipmentCode;
+    const originalLabel = button.getAttribute('aria-label') || 'Salin kode alat';
+    let feedbackTimeout;
+    button.addEventListener('click', async () => {
+      try {
+        if (!code || !navigator.clipboard?.writeText) throw new Error('Clipboard tidak tersedia');
+        await navigator.clipboard.writeText(code);
+        button.textContent = 'Tersalin!';
+        button.setAttribute('aria-label', `Kode ${code} berhasil disalin`);
+      } catch (_) {
+        button.textContent = 'Gagal disalin';
+        button.setAttribute('aria-label', 'Gagal menyalin kode; periksa izin clipboard browser');
+      }
+      window.clearTimeout(feedbackTimeout);
+      feedbackTimeout = window.setTimeout(() => {
+        button.textContent = 'Salin kode';
+        button.setAttribute('aria-label', originalLabel);
+      }, 2000);
+    });
+  });
+
   // Sorting only reorders the rows already displayed, never mutates the database.
   const collator = new Intl.Collator('id', { numeric: true, sensitivity: 'base' });
   document.querySelectorAll('[data-sort-table]').forEach(table => {

@@ -22,3 +22,10 @@
 - Menambahkan tujuh uji integritas SQLite yang berjalan pada database sementara (tidak mengubah database operasional) dan memasukkannya ke skrip pengujian Docker.
 - Hasil audit lokal: 8/8 aturan, 7/7 integritas SQLite, 9/9 template Jinja, 45/45 kombinasi browser tanpa overflow/exception, 7/7 interaksi browser, JavaScript dan Python berhasil diperiksa sintaksnya. **Pengujian Flask, Gunicorn, Compose, dan persistence nyata memerlukan Docker di komputer penguji; belum dinyatakan lulus dari audit lokal ini.**
 - Laporan Word sumber tetap tidak ditimpa: tautan repo/video, bukti Docker dan bagian versi 2.1 perlu diselaraskan setelah uji mesin sebenarnya.
+
+## Pembaruan video kedua: satu fitur sederhana
+
+- Menambahkan **Salin kode** pada setiap baris Data Alat (sebelumnya kode hanya berupa teks).
+- Perubahan hanya pada `templates/equipment_list.html`, `static/app.js`, dan `static/style.css`; bagian README ini mendokumentasikan pembaruan.
+- Tidak ada perubahan backend, skema SQLite, Docker Compose, atau fitur CRUD lama.
+- Verifikasi: buka Data Alat pada `http://127.0.0.1:8080`, klik Salin kode, lalu `Ctrl + V` pada pencarian untuk mencocokkan kode; dokumentasikan build/restart Docker dalam video kedua.
